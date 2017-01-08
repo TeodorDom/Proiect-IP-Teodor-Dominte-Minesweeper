@@ -31,23 +31,24 @@ unsigned int numarMine(unsigned int linie, unsigned int coloana, matrice a)
     return mine;
 }
 
-void construiesteMatrice()
+void construiesteMatrice(unsigned int linieStart, unsigned int coloanaStart)
 {
     unsigned int i,j,linie,coloana;
     srand(time(0));
-    for (i=1;i<=nrMine;i++)
+    for (i=1;i<=nrMine;)
     {
-        linie=rand()%tablaJoc.linii+1;
-        coloana=rand()%tablaJoc.linii+1;
-        tablaJoc.val[linie][coloana]=-1;
+        linie=(rand()%tablaJoc.linii)+1;
+        coloana=(rand()%tablaJoc.linii)+1;
+        if (linie!=linieStart && coloana!=coloanaStart && tablaJoc.val[linie][coloana]==0)
+        {
+            tablaJoc.val[linie][coloana]=-1;
+            ++i;
+        }
     }
     for (i=1;i<=tablaJoc.linii;i++)
         for (j=1;j<=tablaJoc.linii;j++)
-        {
-            afisaj[i][j]=254;
             if (tablaJoc.val[i][j]!=-1)
                 tablaJoc.val[i][j]=numarMine(i,j,tablaJoc);
-        }
 }
 
 void deschide(unsigned int linie, unsigned int coloana)
@@ -61,24 +62,28 @@ void deschide(unsigned int linie, unsigned int coloana)
     else
     {
         unsigned int linieNoua,coloanaNoua,i;
-        for (i=0;i<8;i++)
-        {
-            linieNoua=linie+directieLin[i];
-            coloanaNoua=coloana+directieCol[i];
-            if (linieNoua>=1 && linieNoua<=tablaJoc.linii && coloanaNoua>=1 && coloanaNoua<=tablaJoc.linii)
+        afisaj[linie][coloana]=tablaJoc.val[linie][coloana]+'0';
+        ++deschise;
+        if (tablaJoc.val[linie][coloana]==0)
+            for (i=0;i<8;i++)
             {
-                if (tablaJoc.val[linieNoua][coloanaNoua]!=-1 &&  afisaj[linieNoua][coloanaNoua]==254)
+                linieNoua=linie+directieLin[i];
+                coloanaNoua=coloana+directieCol[i];
+                if ((linieNoua>=1 && linieNoua<=tablaJoc.linii) && (coloanaNoua>=1 && coloanaNoua<=tablaJoc.linii))
                 {
-                    ++deschise;
-                    afisaj[linieNoua][coloanaNoua]=tablaJoc.val[linieNoua][coloanaNoua]+'0';
-                    if (tablaJoc.val[linieNoua][coloanaNoua]==0)
+                    if (tablaJoc.val[linieNoua][coloanaNoua]!=-1 &&  afisaj[linieNoua][coloanaNoua]==254)
                     {
-                        afisaj[linieNoua][coloanaNoua]=' ';
-                        deschide(linieNoua,coloanaNoua);
+                        ++deschise;
+                        afisaj[linieNoua][coloanaNoua]=tablaJoc.val[linieNoua][coloanaNoua]+'0';
+                        if (tablaJoc.val[linieNoua][coloanaNoua]==0)
+                        {
+                            --deschise;
+                            //afisaj[linieNoua][coloanaNoua]=' ';
+                            deschide(linieNoua,coloanaNoua);
+                        }
                     }
                 }
             }
-        }
     }
 }
 
@@ -92,7 +97,6 @@ void afisare()
             cout<<afisaj[i][j]<<" ";
         cout<<endl;
     }
-    cout<<deschise;
 }
 
 void citire()
@@ -110,28 +114,50 @@ void citire()
 void joc()
 {
     char raspuns;
-    unsigned int i,linie,coloana;
+    unsigned int i,j,linie,coloana;
     citire();
-    construiesteMatrice();
+    for (i=1;i<=tablaJoc.linii;i++)
+    {
+        for (j=1;j<=tablaJoc.linii;j++)
+        {
+            afisaj[i][j]=254;
+            cout<<afisaj[i][j]<<" ";
+        }
+        cout<<endl;
+    }
+    cout<<"Ce casuta doresti sa deschizi ?";
+    cin>>linie>>coloana;
+    construiesteMatrice(linie,coloana);
+    deschide(linie,coloana);
     for (i=1;i<=tablaJoc.linii-nrMine && !jocTerminat && deschise!=tablaJoc.linii-nrMine;)
     {
         afisare();
+        if (deschise==(tablaJoc.linii*tablaJoc.linii)-nrMine)
+        {
+            cout<<"AI CASTIGAT !";
+            break;
+        }
         cout<<"Pozitia : linie coloana\n";
         cin>>linie>>coloana;
         cout<<"Deschizi/pui steag/scoti steag? d/f/u";
         cin>>raspuns;
         if (raspuns=='d'||raspuns=='D')
         {
-            deschide(linie,coloana);
-            i++;
+            if (afisaj[linie][coloana]==239)
+                cout<<"Exista steag pe casuta aleasa. Alegeti alta";
+            else
+            {
+                deschide(linie,coloana);
+                i++;
+            }
         }
         else if (raspuns=='f'||raspuns=='F')
             afisaj[linie][coloana]=239;
-        else
+        else if (afisaj[linie][coloana]==239)
             afisaj[linie][coloana]=254;
+        else
+            cout<<"Nu exista steag pe casuta selectata.";
     }
-    if (deschise==tablaJoc.linii-nrMine)
-        cout<<"AI CASTIGAT !";
 }
 
 int main()
