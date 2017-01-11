@@ -1,7 +1,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
-#include <conio.h>
+#include <windows.h>
 using namespace std;
 
 int directieLin[]={-1,-1,-1,0,0,1,1,1},directieCol[]={-1,0,1,-1,1,-1,0,1};
@@ -16,6 +16,38 @@ struct matrice
 
 unsigned char afisaj[51][51];
 
+void sunet()
+{
+    Beep(130.8,200);
+    Beep(155.6,200);
+    Beep(174.6,200);
+    Beep(196,400);
+    Beep(174.6,200);
+    Beep(196,400);
+}
+
+void sunetCastigat()
+{
+    Beep(370,200);
+    Beep(293.7,200);
+    Beep(220,200);
+    Beep(392,200);
+    Beep(329.6,200);
+    Beep(246.9,200);
+    Beep(440,200);
+}
+
+void sunetPierdut()
+{
+    Beep(196,200);
+    Beep(207.7,200);
+    Beep(196,200);
+    Beep(174.6,200);
+    Beep(155.6,200);
+    Beep(146.8,200);
+    Beep(130.8,200);
+}
+
 unsigned int numarMine(unsigned int linie, unsigned int coloana, matrice a)
 {
     unsigned int i,linieNoua,coloanaNoua,mine;
@@ -24,7 +56,7 @@ unsigned int numarMine(unsigned int linie, unsigned int coloana, matrice a)
     {
         linieNoua=linie+directieLin[i];
         coloanaNoua=coloana+directieCol[i];
-        if (linieNoua>=1 && linieNoua<=a.linii && coloanaNoua>=1 && coloanaNoua<=a.linii)
+        if (linieNoua>=1 && linieNoua<=a.linii && coloanaNoua>=1 && coloanaNoua<=a.coloane)
             if (a.val[linieNoua][coloanaNoua]==-1)
                 ++mine;
     }
@@ -38,7 +70,7 @@ void construiesteMatrice(unsigned int linieStart, unsigned int coloanaStart)
     for (i=1;i<=nrMine;)
     {
         linie=(rand()%tablaJoc.linii)+1;
-        coloana=(rand()%tablaJoc.linii)+1;
+        coloana=(rand()%tablaJoc.coloane)+1;
         if (linie!=linieStart && coloana!=coloanaStart && tablaJoc.val[linie][coloana]==0)
         {
             tablaJoc.val[linie][coloana]=-1;
@@ -46,18 +78,53 @@ void construiesteMatrice(unsigned int linieStart, unsigned int coloanaStart)
         }
     }
     for (i=1;i<=tablaJoc.linii;i++)
-        for (j=1;j<=tablaJoc.linii;j++)
+        for (j=1;j<=tablaJoc.coloane;j++)
             if (tablaJoc.val[i][j]!=-1)
                 tablaJoc.val[i][j]=numarMine(i,j,tablaJoc);
+}
+
+void afisareMine()
+{
+    unsigned int i,j;
+    for (i=1;i<=tablaJoc.linii;i++)
+        for (j=1;j<=tablaJoc.coloane;j++)
+            if (tablaJoc.val[i][j]==-1)
+                afisaj[i][j]=15;
+}
+
+void afisare()
+{
+    int i,j;
+    system("cls");
+    cout<<"  |";
+    for (j=1;j<=tablaJoc.coloane;j++)
+        cout<<j<<"|";
+    cout<<endl;
+    for (j=1;j<=tablaJoc.coloane;j++)
+            cout<<"--";
+    cout<<"---";
+    cout<<endl;
+    for (i=1;i<=tablaJoc.linii;i++)
+    {
+        cout<<i<<"| ";
+        for (j=1;j<=tablaJoc.coloane;j++)
+            cout<<afisaj[i][j]<<"|";
+        cout<<endl;
+    }
+    for (j=1;j<=tablaJoc.coloane;j++)
+            cout<<"--";
+    cout<<"---\n";
 }
 
 void deschide(unsigned int linie, unsigned int coloana)
 {
     if (tablaJoc.val[linie][coloana]==-1)
     {
-        afisaj[linie][coloana]=15;
         jocTerminat=1;
+        afisareMine();
+        afisare();
         cout<<"AI PIERDUT !";
+        sunetPierdut();
     }
     else
     {
@@ -66,12 +133,12 @@ void deschide(unsigned int linie, unsigned int coloana)
         ++deschise;
         if (tablaJoc.val[linie][coloana]==0)
         {
-            afisaj[linie][coloana]=' ';
+            afisaj[linie][coloana]='-';
             for (i=0;i<8;i++)
             {
                 linieNoua=linie+directieLin[i];
                 coloanaNoua=coloana+directieCol[i];
-                if ((linieNoua>=1 && linieNoua<=tablaJoc.linii) && (coloanaNoua>=1 && coloanaNoua<=tablaJoc.linii))
+                if ((linieNoua>=1 && linieNoua<=tablaJoc.linii) && (coloanaNoua>=1 && coloanaNoua<=tablaJoc.coloane))
                 {
                     if (tablaJoc.val[linieNoua][coloanaNoua]!=-1 &&  afisaj[linieNoua][coloanaNoua]==254)
                     {
@@ -80,7 +147,6 @@ void deschide(unsigned int linie, unsigned int coloana)
                         if (tablaJoc.val[linieNoua][coloanaNoua]==0)
                         {
                             --deschise;
-                            //afisaj[linieNoua][coloanaNoua]=' ';
                             deschide(linieNoua,coloanaNoua);
                         }
                     }
@@ -90,45 +156,31 @@ void deschide(unsigned int linie, unsigned int coloana)
     }
 }
 
-void afisare()
-{
-    int i,j;
-    system("cls");
-    cout<<"  |";
-    for (i=1;i<=tablaJoc.linii;i++)
-        cout<<i<<" | ";
-    cout<<endl;
-    for (j=1;j<=tablaJoc.coloane;j++)
-            cout<<"----";
-    cout<<"--";
-    cout<<endl;
-    for (i=1;i<=tablaJoc.linii;i++)
-    {
-        cout<<i<<"| ";
-        for (j=1;j<=tablaJoc.coloane;j++)
-            cout<<afisaj[i][j]<<" | ";
-        cout<<endl;
-    }
-    for (j=1;j<=tablaJoc.coloane;j++)
-            cout<<"----";
-    cout<<"--\n";
-}
-
 void citire()
 {
     cout<<"Numarul de linii :\n";cin>>tablaJoc.linii;
-    cout<<"Numarul de coloane :\n";cin>>tablaJoc.coloane;
-    while (tablaJoc.linii>50 || tablaJoc.coloane>50)
+    while (cin.fail() || tablaJoc.linii>50 || tablaJoc.linii<=2)
     {
-        cout<<"Numarul de linii sau de coloane nu are voie sa depaseasca 50. Reintroduceti.\n";
-        cout<<"Numarul de linii :\n";cin>>tablaJoc.linii;
-        cout<<"Numarul de coloane :\n";cin>>tablaJoc.coloane;
+        cin.clear();
+        cin.ignore(100,'\n');
+        cout<<"Numarul de linii este invalid (trebuie sa apartina intervalului [2,50]). Introduceti din nou."<<endl;
+        cin>>tablaJoc.linii;
+    }
+    cout<<"Numarul de coloane :\n";cin>>tablaJoc.coloane;
+    while (cin.fail() || tablaJoc.coloane>50 || tablaJoc.coloane<=2)
+    {
+        cin.clear();
+        cin.ignore(100,'\n');
+        cout<<"Numarul de coloane este invalid (trebuie sa apartina intervalului [2,50]). Introduceti din nou."<<endl;
+        cin>>tablaJoc.coloane;
     }
     cout<<"Numarul de mine , max "<<(tablaJoc.linii-1)*(tablaJoc.coloane-1)<<" :\n";
     cin>>nrMine;
-    while (nrMine>(tablaJoc.linii-1)*(tablaJoc.coloane-1))
+    while (cin.fail() || nrMine>(tablaJoc.linii-1)*(tablaJoc.coloane-1))
     {
-        cout<<"Numarul de mine este prea mare. Introduceti din nou \n";
+        cin.clear();
+        cin.ignore(100,'\n');
+        cout<<"Numarul de mine este invalid. Maximul este "<<(tablaJoc.linii-1)*(tablaJoc.coloane-1)<<". Introduceti din nou."<<endl;
         cin>>nrMine;
     }
 }
@@ -138,16 +190,16 @@ void meniu();
 void joc()
 {
     bool alegereBuna;
-    char raspuns,linie,coloana;
-    unsigned int i,j,valoareLinie,valoareColoana;
+    char raspuns;
+    unsigned int i,j,linie,coloana;
     system("cls");
     cout<<"  |";
-    for (i=1;i<=tablaJoc.linii;i++)
-        cout<<i<<" | ";
+    for (j=1;j<=tablaJoc.coloane;j++)
+        cout<<j<<"|";
     cout<<endl;
     for (j=1;j<=tablaJoc.coloane;j++)
-            cout<<"----";
-    cout<<"--";
+            cout<<"--";
+    cout<<"---";
     cout<<endl;
     for (i=1;i<=tablaJoc.linii;i++)
     {
@@ -155,83 +207,103 @@ void joc()
         for (j=1;j<=tablaJoc.coloane;j++)
         {
             afisaj[i][j]=254;
-            cout<<afisaj[i][j]<<" | ";
+            cout<<afisaj[i][j]<<"|";
         }
         cout<<endl;
     }
     for (j=1;j<=tablaJoc.coloane;j++)
-            cout<<"----";
-    cout<<"--\n";
-    cout<<"Ce casuta doresti sa deschizi ?";
-    cin>>linie>>coloana;
-    valoareLinie=linie-'0';
-    valoareColoana=coloana-'0';
-    while (valoareLinie>tablaJoc.linii || valoareColoana>tablaJoc.coloane || valoareLinie<=0 || valoareColoana<=0)
-            {
-                cout<<"Pozitia introdusa este in afara matricei. Alegeti alta.\n";
-                cin>>linie>>coloana;
-                valoareLinie=linie-'0';
-                valoareColoana=coloana-'0';
-            }
-    construiesteMatrice(valoareLinie,valoareColoana);
-    deschide(valoareLinie,valoareColoana);
+            cout<<"--";
+    cout<<"---\n";
+    sunet();
+    cout<<"Ce casuta doresti sa deschizi ?\n";
+    cout<<"Linie :";
+    cin>>linie;
+    while (cin.fail() || linie>tablaJoc.linii || linie<=0)
+    {
+        cin.clear();
+        cin.ignore(100,'\n');
+        cout<<"Linie invalida. Introduceti din nou"<<endl;
+        cin>>linie;
+    }
+    cout<<"Coloana :";
+    cin>>coloana;
+    while (cin.fail() || coloana>tablaJoc.coloane || coloana<=0)
+    {
+        cin.clear();
+        cin.ignore(100,'\n');
+        cout<<"Coloana invalida. Introduceti din nou"<<endl;
+        cin>>coloana;
+    }
+    construiesteMatrice(linie,coloana);
+    deschide(linie,coloana);
     while (!jocTerminat)
     {
         afisare();
         if (deschise==(tablaJoc.linii*tablaJoc.coloane)-nrMine)
         {
             cout<<"AI CASTIGAT !";
+            sunetCastigat();
             break;
         }
         alegereBuna=0;
         while (!alegereBuna)
         {
 
-            cout<<"Pozitia : linie coloana\n";
-            cin>>linie>>coloana;
-            valoareLinie=linie-'0';
-            valoareColoana=coloana-'0';
-            while (valoareLinie>tablaJoc.linii || valoareColoana>tablaJoc.coloane || valoareLinie<=0 || valoareColoana<=0)
+            cout<<"Ce casuta doresti sa alegi ?\n";
+            cout<<"Linie :";
+            cin>>linie;
+            while (cin.fail() || linie>tablaJoc.linii || linie<=0)
             {
-                cout<<"Pozitia introdusa este in afara matricei. Alegeti alta.\n";
-                cin>>linie>>coloana;
-                valoareLinie=linie-'0';
-                valoareColoana=coloana-'0';
+                cin.clear();
+                cin.ignore(100,'\n');
+                cout<<"Linie invalida. Introduceti din nou"<<endl;
+                cin>>linie;
+            }
+            cout<<"Coloana :";
+            cin>>coloana;
+            while (cin.fail() || coloana>tablaJoc.coloane || coloana<=0)
+            {
+                cin.clear();
+                cin.ignore(100,'\n');
+                cout<<"Coloana invalida. Introduceti din nou"<<endl;
+                cin>>coloana;
             }
             cout<<"Deschizi/pui steag/scoti steag? d/f/u\n";
             cin>>raspuns;
             if (raspuns=='d'||raspuns=='D')
             {
-                if (afisaj[valoareLinie][valoareColoana]==239)
+                if (afisaj[linie][coloana]==239)
                     cout<<"Exista steag pe casuta aleasa. Alegeti alta.\n";
-                else if (afisaj[valoareLinie][valoareColoana]>='1' && afisaj[valoareLinie][valoareColoana]<='9')
+                else if (afisaj[linie][coloana]>='1' && afisaj[linie][coloana]<='9')
                     cout<<"Casuta data este deja deschisa. Alegeti alta.\n";
                 else
                 {
-                    deschide(valoareLinie,valoareColoana);
+                    deschide(linie,coloana);
                     i++;
                     alegereBuna=1;
                 }
             }
             else if (raspuns=='f'||raspuns=='F')
             {
-                if (afisaj[valoareLinie][valoareColoana]==255)
+                if (afisaj[linie][coloana]==254)
                 {
-                    afisaj[valoareLinie][valoareColoana]=239;
+                    afisaj[linie][coloana]=239;
                     alegereBuna=1;
                 }
             }
-            else
+            else if (raspuns=='u' || raspuns=='U')
             {
 
-                if (afisaj[valoareLinie][valoareColoana]==239)
+                if (afisaj[linie][coloana]==239)
                 {
-                    afisaj[valoareLinie][valoareColoana]=254;
+                    afisaj[linie][coloana]=254;
                     alegereBuna=1;
                 }
                 else
                     cout<<"Nu exista steag pe casuta selectata.Alegeti alta.\n";
             }
+            else
+                cout<<"Raspuns invalid.";
         }
     }
     cout<<"\nDoriti sa jucati din nou ? d/n\n";
@@ -244,6 +316,7 @@ void joc()
     if (raspuns=='d')
     {
         system("cls");
+        jocTerminat=0;
         meniu();
     }
 }
@@ -251,19 +324,24 @@ void joc()
 void meniu()
 {
     char raspuns;
-    cout<<" ------------------------------------------------------------------------------------------- "<<endl;
+    /*cout<<" ------------------------------------------------------------------------------------------- "<<endl;
     cout<<"|  | \    / | || | \    || / ===  ==== \\              // / === / === | ==\\  / === | ==\\  |"<<endl;
     cout<<"|  ||\\  //|| || ||\\   || ||    ||     \\            //  ||    ||    ||   || ||    ||   || |"<<endl;
     cout<<"|  || \\// || || || \\  || | ===  ====   \\          //   | === | === | ==//  | === | ==//  |"<<endl;
     cout<<"|  ||      || || ||  \\ || ||        ||   \\  //\\  //    ||    ||    ||      ||    ||  \\  |"<<endl;
     cout<<"|  ||      || || ||   \  | \ ===  ====     \\//  \\//     \ === \ === ||      \ === ||   \\ |"<<endl;
-    cout<<" ------------------------------------------------------------------------------------------- "<<endl;
+    cout<<" ------------------------------------------------------------------------------------------- "<<endl;*/
+    cout<<"      -----------------------"<<endl;
+    cout<<"     |                       |"<<endl;
+    cout<<"     |      MINESWEEPER      |"<<endl;
+    cout<<"     |                       |"<<endl;
+    cout<<"      -----------------------"<<endl;
     cout<<endl;
-    cout<<"Ce nivel de dificultate doriti ?"<<endl<<endl;
-    cout<<"     1)Beginner (9x9, 10 mine)"<<endl;
-    cout<<"     2)Intermediate (16x16, 40 de mine)"<<endl;
-    cout<<"     3)Advanced (16x30, 99 de mine)"<<endl;
-    cout<<"     4)Custom"<<endl;
+    cout<<"     Ce nivel de dificultate doriti ?"<<endl<<endl;
+    cout<<"         1)Usor (9x9, 10 mine)"<<endl;
+    cout<<"         2)Mediu (16x16, 40 de mine)"<<endl;
+    cout<<"         3)Greu (16x30, 99 de mine)"<<endl;
+    cout<<"         4)Custom"<<endl;
     cin>>raspuns;
     while (raspuns<'1'||raspuns>'4')
     {
