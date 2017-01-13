@@ -1,0 +1,6 @@
+REGULILE JOCULUI:
+
+	Scopul jocului e de a deschide toate casutele in care nu se afla o mina. In fiecare casuta se va afla numarul minelor adiacente acesteia ('-' pentru 0 mine), iar in cazul in care in casuta deschisa se afla 0 mine, se vor deschide toate casutele adiacente care nu sunt mine. Jocul se termina in momentul in care utilizatorul deschide o casuta in care se afla o mina sau deschide toate casutele libere.
+
+CUM SE JOACA:
+	Dupa deschiderea fisierului in CodeBlocks si executarea acestuia, utilizatorul va ajunge la un meniu din care isi va putea alege limba in care doreste sa joace (1-romana, 2-engleza, orice raspuns diferit de cele doua fiind invalid). Dupa aceasta, va ajunge intr-un meniu din care va putea alege dificultatea jocului, putand, totodata, sa isi creeze un joc custom, in care va putea selecta numarul de linii,coloane si mine. De asemenea, exista o tasta ce permite schimbarea limbii. Dupa ce a selectat dificultatea jocului, este afisata matricea- joc, iar utilizatorul trebuie, la inceput, sa introduca o linie si o coloana, urmand ca la pozitiile urmatoare sa introduca si o 'actiune' (deschidere/flag/unflag) pe care sa o aplice casutei respective. Atunci cand jocul este castigat/pierdut, utilizatorul poate alege daca vrea sa joace din nou sau nu. Daca raspunsul este da, va fi transportat din nou la meniul principal.
