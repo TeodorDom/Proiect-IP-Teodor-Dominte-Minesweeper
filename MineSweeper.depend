@@ -1,7 +1,0 @@
-# depslib dependency file v1.0
-1484338717 source:c:\users\teo\documents\codeblocks\minesweeper\main.cpp
-	<iostream>
-	<cstdlib>
-	<ctime>
-	<windows.h>
-
